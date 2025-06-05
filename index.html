@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hillview Check-In</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
+    input, select, button { width: 100%; padding: 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Hillview Camp Duty Check-In</h2>
+
+  <label for="name">Name</label>
+  <input list="names" id="name" placeholder="Start typing your name..." required />
+  <datalist id="names">
+    <option value="Asher"><option value="Benjamin"><option value="Chen Chang">
+    <option value="Daniel"><option value="Dervin"><option value="Dong Han">
+    <option value="Eason"><option value="Edwin"><option value="Emmanuel">
+    <option value="Eric"><option value="Esher"><option value="Ethan">
+    <option value="Farhansha"><option value="Harshith"><option value="Hibri">
+    <option value="Hui Han"><option value="Isaac Chew"><option value="Jason">
+    <option value="Joshua"><option value="Keane"><option value="Kieran">
+    <option value="Madan"><option value="Philip"><option value="Qi An">
+    <option value="Raphael"><option value="Ron"><option value="Ruo Chen">
+    <option value="Shunxin"><option value="Viknesh">
+  </datalist>
+
+  <label for="shift">Shift</label>
+  <select id="shift" required>
+    <option value="">Select shift</option>
+    <option value="AM">AM (0800–1730)</option>
+    <option value="PM">PM (1730–0800)</option>
+  </select>
+
+  <button onclick="submitForm()">I have arrived</button>
+
+  <p id="status" style="margin-top:20px;"></p>
+
+  <script>
+    async function submitForm() {
+      const name = document.getElementById("name").value.trim();
+      const shift = document.getElementById("shift").value;
+      const status = document.getElementById("status");
+      status.textContent = "Getting location...";
+
+      if (!name || !shift) {
+        status.textContent = "Please enter name and shift.";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        const res = await fetch("https://script.google.com/macros/s/AKfycbxCsHKRmwYpeIec-813G1kXUFu0WsMbuP7gAUbnSH1wDevq05lXT3Cw-Gi34X8CFtT44w/exec", {
+          method: "POST",
+          body: JSON.stringify({ name, shift, lat, lng }),
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const text = await res.text();
+        status.textContent = text.includes("Success") ? "✅ Check-in successful!" : `❌ ${text}`;
+      }, () => {
+        status.textContent = "❌ Unable to get location.";
+      });
+    }
+  </script>
+</body>
+</html>
