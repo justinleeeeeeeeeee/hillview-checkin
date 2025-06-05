@@ -55,7 +55,7 @@
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
 
-        const res = await fetch("https://script.google.com/macros/s/AKfycbxCsHKRmwYpeIec-813G1kXUFu0WsMbuP7gAUbnSH1wDevq05lXT3Cw-Gi34X8CFtT44w/exec", {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbyD93zN39IYD2DlllixPvG8rjZqV4uN2jBuUCrEo-T6o7S0jKJ9HHgzvw1zelrme5wAuA/exec", {
           method: "POST",
           body: JSON.stringify({ name, shift, lat, lng }),
           headers: { "Content-Type": "application/json" }
