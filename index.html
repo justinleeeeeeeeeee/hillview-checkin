@@ -1,32 +1,52 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>Hillview Check-In</title>
   <style>
     body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
-    input, select, button { width: 100%; padding: 10px; margin-top: 10px; }
+    input, select, button { width: 100%; padding: 12px; margin-top: 10px; font-size: 16px; }
+    #status { margin-top: 20px; font-weight: bold; }
   </style>
 </head>
 <body>
   <h2>Hillview Camp Duty Check-In</h2>
 
-  <label for="name">Name</label>
-  <input list="names" id="name" placeholder="Start typing your name..." required />
-  <datalist id="names">
-    <option value="Asher"><option value="Benjamin"><option value="Chen Chang">
-    <option value="Daniel"><option value="Dervin"><option value="Dong Han">
-    <option value="Eason"><option value="Edwin"><option value="Emmanuel">
-    <option value="Eric"><option value="Esher"><option value="Ethan">
-    <option value="Farhansha"><option value="Harshith"><option value="Hibri">
-    <option value="Hui Han"><option value="Isaac Chew"><option value="Jason">
-    <option value="Joshua"><option value="Keane"><option value="Kieran">
-    <option value="Madan"><option value="Philip"><option value="Qi An">
-    <option value="Raphael"><option value="Ron"><option value="Ruo Chen">
-    <option value="Shunxin"><option value="Viknesh">
-  </datalist>
+  <label for="name">Select Your Name</label>
+  <select id="name" required>
+    <option value="">-- Choose your name --</option>
+    <option value="Asher">Asher</option>
+    <option value="Benjamin">Benjamin</option>
+    <option value="Chen Chang">Chen Chang</option>
+    <option value="Daniel">Daniel</option>
+    <option value="Dervin">Dervin</option>
+    <option value="Dong Han">Dong Han</option>
+    <option value="Eason">Eason</option>
+    <option value="Edwin">Edwin</option>
+    <option value="Emmanuel">Emmanuel</option>
+    <option value="Eric">Eric</option>
+    <option value="Esher">Esher</option>
+    <option value="Ethan">Ethan</option>
+    <option value="Farhansha">Farhansha</option>
+    <option value="Harshith">Harshith</option>
+    <option value="Hibri">Hibri</option>
+    <option value="Hui Han">Hui Han</option>
+    <option value="Isaac Chew">Isaac Chew</option>
+    <option value="Jason">Jason</option>
+    <option value="Joshua">Joshua</option>
+    <option value="Keane">Keane</option>
+    <option value="Kieran">Kieran</option>
+    <option value="Madan">Madan</option>
+    <option value="Philip">Philip</option>
+    <option value="Qi An">Qi An</option>
+    <option value="Raphael">Raphael</option>
+    <option value="Ron">Ron</option>
+    <option value="Ruo Chen">Ruo Chen</option>
+    <option value="Shunxin">Shunxin</option>
+    <option value="Viknesh">Viknesh</option>
+  </select>
 
   <label for="shift">Shift</label>
   <select id="shift" required>
@@ -37,17 +57,17 @@
 
   <button onclick="submitForm()">I have arrived</button>
 
-  <p id="status" style="margin-top:20px;"></p>
+  <p id="status"></p>
 
   <script>
     async function submitForm() {
-      const name = document.getElementById("name").value.trim();
+      const name = document.getElementById("name").value;
       const shift = document.getElementById("shift").value;
       const status = document.getElementById("status");
-      status.textContent = "Getting location...";
+      status.textContent = "📍 Getting location...";
 
       if (!name || !shift) {
-        status.textContent = "Please enter name and shift.";
+        status.textContent = "⚠️ Please select both your name and shift.";
         return;
       }
 
@@ -55,16 +75,21 @@
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
 
-        const res = await fetch("https://script.google.com/macros/s/AKfycbyD93zN39IYD2DlllixPvG8rjZqV4uN2jBuUCrEo-T6o7S0jKJ9HHgzvw1zelrme5wAuA/exec", {
-          method: "POST",
-          body: JSON.stringify({ name, shift, lat, lng }),
-          headers: { "Content-Type": "application/json" }
-        });
+        try {
+          const res = await fetch("https://script.google.com/macros/s/AKfycbxCsHKRmwYpeIec-813G1kXUFu0WsMbuP7gAUbnSH1wDevq05lXT3Cw-Gi34X8CFtT44w/exec", {
+            method: "POST",
+            body: JSON.stringify({ name, shift, lat, lng }),
+            headers: { "Content-Type": "application/json" }
+          });
 
-        const text = await res.text();
-        status.textContent = text.includes("Success") ? "✅ Check-in successful!" : `❌ ${text}`;
+          const text = await res.text();
+          status.textContent = text;
+
+        } catch (err) {
+          status.textContent = "❌ Failed to connect. Try again.";
+        }
       }, () => {
-        status.textContent = "❌ Unable to get location.";
+        status.textContent = "❌ Unable to access location. Please allow permission.";
       });
     }
   </script>
