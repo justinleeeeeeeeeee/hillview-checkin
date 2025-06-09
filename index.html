@@ -27,7 +27,38 @@
   <h2>DAILYBOT Check-In</h2>
 
   <label for="name">Name:</label>
-  <input type="text" id="name" placeholder="Enter your name">
+  <select id="name">
+    <option value="">-- Select Your Name --</option>
+    <option value="Asher">Asher</option>
+    <option value="Benjamin">Benjamin</option>
+    <option value="Chen Chang">Chen Chang</option>
+    <option value="Daniel">Daniel</option>
+    <option value="Dervin">Dervin</option>
+    <option value="Dong Han">Dong Han</option>
+    <option value="Eason">Eason</option>
+    <option value="Edwin">Edwin</option>
+    <option value="Emmanuel">Emmanuel</option>
+    <option value="Eric">Eric</option>
+    <option value="Esher">Esher</option>
+    <option value="Ethan">Ethan</option>
+    <option value="Farhansha">Farhansha</option>
+    <option value="Harshith">Harshith</option>
+    <option value="Hibri">Hibri</option>
+    <option value="Hui Han">Hui Han</option>
+    <option value="Isaac Chew">Isaac Chew</option>
+    <option value="Jason">Jason</option>
+    <option value="Joshua">Joshua</option>
+    <option value="Keane">Keane</option>
+    <option value="Kieran">Kieran</option>
+    <option value="Madan">Madan</option>
+    <option value="Philip">Philip</option>
+    <option value="Qi An">Qi An</option>
+    <option value="Raphael">Raphael</option>
+    <option value="Ron">Ron</option>
+    <option value="Ruo Chen">Ruo Chen</option>
+    <option value="Shunxin">Shunxin</option>
+    <option value="Viknesh">Viknesh</option>
+  </select>
 
   <label for="shift">Shift:</label>
   <select id="shift">
@@ -43,11 +74,11 @@
   <script>
     function getLocationAndSubmit() {
       const status = document.getElementById("status");
-      const name = document.getElementById("name").value.trim();
+      const name = document.getElementById("name").value;
       const shift = document.getElementById("shift").value;
 
       if (!name || !shift) {
-        status.textContent = "Please enter your name and shift.";
+        status.textContent = "Please select your name and shift.";
         return;
       }
 
