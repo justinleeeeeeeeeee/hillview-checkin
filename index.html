@@ -1,111 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Hillview Check-In</title>
+  <meta charset="UTF-8">
+  <title>DAILYBOT Check-In</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
-    input, select, button { width: 100%; padding: 12px; margin-top: 10px; font-size: 16px; }
-    #status { margin-top: 20px; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2em;
+      max-width: 500px;
+      margin: auto;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 1em;
+    }
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h2>Hillview Camp Duty Check-In</h2>
+  <h2>DAILYBOT Check-In</h2>
 
-  <label for="name">Select Your Name</label>
-  <select id="name" required>
-    <option value="">-- Choose your name --</option>
-    <option value="Asher">Asher</option>
-    <option value="Benjamin">Benjamin</option>
-    <option value="Chen Chang">Chen Chang</option>
-    <option value="Daniel">Daniel</option>
-    <option value="Dervin">Dervin</option>
-    <option value="Dong Han">Dong Han</option>
-    <option value="Eason">Eason</option>
-    <option value="Edwin">Edwin</option>
-    <option value="Emmanuel">Emmanuel</option>
-    <option value="Eric">Eric</option>
-    <option value="Esher">Esher</option>
-    <option value="Ethan">Ethan</option>
-    <option value="Farhansha">Farhansha</option>
-    <option value="Harshith">Harshith</option>
-    <option value="Hibri">Hibri</option>
-    <option value="Hui Han">Hui Han</option>
-    <option value="Isaac Chew">Isaac Chew</option>
-    <option value="Jason">Jason</option>
-    <option value="Joshua">Joshua</option>
-    <option value="Keane">Keane</option>
-    <option value="Kieran">Kieran</option>
-    <option value="Madan">Madan</option>
-    <option value="Philip">Philip</option>
-    <option value="Qi An">Qi An</option>
-    <option value="Raphael">Raphael</option>
-    <option value="Ron">Ron</option>
-    <option value="Ruo Chen">Ruo Chen</option>
-    <option value="Shunxin">Shunxin</option>
-    <option value="Viknesh">Viknesh</option>
+  <label for="name">Name:</label>
+  <input type="text" id="name" placeholder="Enter your name">
+
+  <label for="shift">Shift:</label>
+  <select id="shift">
+    <option value="">-- Select Shift --</option>
+    <option value="AM">AM</option>
+    <option value="PM">PM</option>
   </select>
 
-  <label for="shift">Shift</label>
-  <select id="shift" required>
-    <option value="">Select shift</option>
-    <option value="AM">AM (0800–1730)</option>
-    <option value="PM">PM (1730–0800)</option>
-  </select>
+  <button onclick="getLocationAndSubmit()">Submit</button>
 
-  <button onclick="submitForm()">I have arrived</button>
-
-  <p id="status"></p>
+  <div id="status"></div>
 
   <script>
-    async function submitForm() {
-      const name = document.getElementById("name").value;
-      const shift = document.getElementById("shift").value;
+    function getLocationAndSubmit() {
       const status = document.getElementById("status");
-      status.textContent = "📍 Requesting location permission...";
+      const name = document.getElementById("name").value.trim();
+      const shift = document.getElementById("shift").value;
 
       if (!name || !shift) {
-        status.textContent = "⚠️ Please select both your name and shift.";
+        status.textContent = "Please enter your name and shift.";
         return;
       }
 
       if (!navigator.geolocation) {
-        status.textContent = "❌ Your browser does not support location.";
+        status.textContent = "Geolocation is not supported by your browser.";
         return;
       }
 
-      navigator.geolocation.getCurrentPosition(
-        async pos => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
+      status.textContent = "Getting location...";
 
-          try {
-            const res = await fetch("https://script.google.com/macros/s/AKfycbxCsHKRmwYpeIec-813G1kXUFu0WsMbuP7gAUbnSH1wDevq05lXT3Cw-Gi34X8CFtT44w/exec", {
-              method: "POST",
-              body: JSON.stringify({ name, shift, lat, lng }),
-              headers: { "Content-Type": "application/json" }
-            });
+      navigator.geolocation.getCurrentPosition(success, error, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      });
 
-            const text = await res.text();
-            status.textContent = text;
+      function success(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const device = /iPhone|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop";
 
-          } catch (err) {
-            status.textContent = "❌ Failed to connect. Try again.";
+        const payload = {
+          name: name,
+          shift: shift,
+          lat: lat,
+          lng: lng,
+          device: device
+        };
+
+        fetch('https://script.google.com/macros/s/AKfycbxCsHKRmwYpeIec-813G1kXUFu0WsMbuP7gAUbnSH1wDevq05lXT3Cw-Gi34X8CFtT44w/exec', {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: {
+            "Content-Type": "application/json"
           }
-        },
-        error => {
-          if (error.code === error.PERMISSION_DENIED) {
-            status.textContent = "❌ Location access was denied. Please allow it in your settings.";
-          } else if (error.code === error.TIMEOUT) {
-            status.textContent = "❌ Location request timed out. Try again near a window.";
-          } else {
-            status.textContent = "❌ Unable to get location. Please try again.";
-          }
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
+        })
+        .then(response => response.text())
+        .then(data => {
+          status.textContent = "✅ Check-in successful.";
+        })
+        .catch(err => {
+          console.error(err);
+          status.textContent = "❌ Error submitting. Please try again.";
+        });
+      }
+
+      function error(err) {
+        console.warn(`ERROR(${err.code}): ${err.message}`);
+        status.textContent = "❌ Location access denied. Please enable it in browser settings.";
+      }
     }
   </script>
 </body>
